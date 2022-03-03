@@ -6,7 +6,19 @@
         {
             "label": "assemble",
             "type": "shell",
-            "command": "dasm ${fileBasename} -R -v5 -o${fileBasenameNoExtension}.bin",
+            "command": "dasm ${fileBasename} -R  -f3 -v5 -o${fileBasenameNoExtension}.bin",
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "group": "build",
+            "presentation": {
+                "reveal": "silent",
+            }
+        },
+        {
+            "label": "assemble and dump",
+            "type": "shell",
+            "command": "dasm ${fileBasename} -R -f3 -o${fileBasenameNoExtension}.bin && hexdump -C ${fileBasenameNoExtension}.bin > ${fileBasenameNoExtension}.txt",
             "options": {
                 "cwd": "${fileDirname}"
             },
