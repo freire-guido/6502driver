@@ -18,7 +18,7 @@
         {
             "label": "assemble and dump",
             "type": "shell",
-            "command": "dasm ${fileBasename} -R -f3 -o${fileBasenameNoExtension}.bin && hexdump -C ${fileBasenameNoExtension}.bin > ${fileBasenameNoExtension}.txt",
+            "command": "../filetoserial.sh ${fileBasenameNoExtension}",
             "options": {
                 "cwd": "${fileDirname}"
             },
@@ -27,7 +27,7 @@
                 "isDefault": true
             },
             "presentation": {
-                "reveal": "silent",
+                "reveal": "silent"
             }
         }
     ]
