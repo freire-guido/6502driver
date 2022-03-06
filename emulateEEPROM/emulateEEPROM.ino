@@ -22,7 +22,7 @@ void setup() {
   EEPROM[0xFFFC - offset] = 0x00;
   EEPROM[0xFFFD - offset] = 0xFC;
 
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println(EEPROM.length());
   Serial.println("RDY");
 }
@@ -32,10 +32,12 @@ void loop() {
     if (digitalRead(CS) == HIGH) {
       writeBus(data_bus, EEPROM[readBus(addr_bus, 16) - offset]);
       serviced = true;
+      digitalWrite(LED_BUILTIN, HIGH);
     }
   }
   if (digitalRead(CS) == LOW) {
     serviced = false;
+    digitalWrite(LED_BUILTIN, LOW);
   }
 }
 
@@ -68,7 +70,6 @@ void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
 }
 
 void serialEvent() {
-  digitalWrite(LED_BUILTIN, HIGH);
   String message = Serial.readString();
   Serial.println(message.length());
   byte buffer[16];
@@ -82,7 +83,6 @@ void serialEvent() {
     }
     b += sizeof(buffer);
   }
-  digitalWrite(LED_BUILTIN, LOW);
   hexdump();
   eepromClear();
 }
