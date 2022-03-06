@@ -26,6 +26,15 @@ void setup() {
 }
 
 void loop() {
+  while (!serviced) {
+    if (digitalRead(CS) == HIGH) {
+      writeBus(data_bus, EEPROM[readBus(addr_bus, 16)]);
+      serviced = true;
+    }
+  }
+  if (digitalRead(CS) == LOW) {
+    serviced = false;
+  }
 }
 
 void eepromClear() {
