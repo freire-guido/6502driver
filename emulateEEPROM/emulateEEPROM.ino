@@ -1,8 +1,11 @@
 #include <EEPROM.h>
 #include "busmanager.h"
 
-const int addr_bus[8] = {4, 5, A0, A1, A2, A3, A4, A5};
-const int data_bus[8] = {6, 7, 8, 9, 10, 11, 12, 13};
+const int addr_bus[16] = {4, 4, 4, 4, 4, 4, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+// data bus is actually 10 bits (pins 3 and 5 - 13) long, 4s are trash
+const int data_bus[8] = {1, 2, A0, A1, A2, A3, A4, A5};
+const int CS = 0;
+bool serviced = false;
 
 void setup() {
   for (int addr : addr_bus) {
@@ -11,12 +14,18 @@ void setup() {
   for (int data : data_bus) {
     pinMode(data, OUTPUT);
   }
+  pinMode(4, INPUT_PULLUP); // 4s are trash
+  pinMode(CS, INPUT);
+
   eepromClear();
+  EEPROM[0xFFFC] = 0x00;
+  EEPROM[0xFFFD] = 0xFC;
+
   Serial.begin(9600);
+  Serial.println("RDY");
 }
 
 void loop() {
-  
 }
 
 void eepromClear() {
@@ -26,14 +35,15 @@ void eepromClear() {
 }
 
 void hexdump() {
-  for (int i = 0; i < 256; i++) {
+  for (int i = 0; i < EEPROM.length(); i++) {
+    if (i % 16 == 0) {
+      Serial.print('\n');
+      Serial.print(i, HEX);
+      Serial.print(' ');
+    }
     Serial.print(EEPROM[i], HEX);
     Serial.print(' ');
-    if (i % 16 == 15) {
-      Serial.print('\n');
-    }
   }
-  Serial.print('\n');
 }
 
 void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
