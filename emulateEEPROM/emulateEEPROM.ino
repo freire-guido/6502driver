@@ -2,6 +2,7 @@
 #include "busmanager.h"
 
 const int addr_bus[16] = {4, 4, 4, 4, 4, 4, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+const int offset = 0xFC00;
 // data bus is actually 10 bits (pins 3 and 5 - 13) long, 4s are trash
 const int data_bus[8] = {1, 2, A0, A1, A2, A3, A4, A5};
 const int CS = 0;
@@ -18,17 +19,18 @@ void setup() {
   pinMode(CS, INPUT);
 
   eepromClear();
-  EEPROM[0xFFFC] = 0x00;
-  EEPROM[0xFFFD] = 0xFC;
+  EEPROM[0xFFFC - offset] = 0x00;
+  EEPROM[0xFFFD - offset] = 0xFC;
 
   Serial.begin(9600);
+  Serial.println(EEPROM.length());
   Serial.println("RDY");
 }
 
 void loop() {
   while (!serviced) {
     if (digitalRead(CS) == HIGH) {
-      writeBus(data_bus, EEPROM[readBus(addr_bus, 16)]);
+      writeBus(data_bus, EEPROM[readBus(addr_bus, 16) - offset]);
       serviced = true;
     }
   }

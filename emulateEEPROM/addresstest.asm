@@ -1,6 +1,6 @@
     PROCESSOR 6502
-    .ORG $0000
 
+    ORG $FC00
     LDX #$01
     LDA #$05
     STA $01
