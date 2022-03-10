@@ -2,12 +2,14 @@
 #include "busmanager.h"
 #include "oscillator.h"
 
+const int osc = 3;
 const int addr_bus[16] = {1, 1, 1, 1, 1, 1, 1, 1, 4, 5, A5, A4, A3, A2, A1, A0};
-const int offset = 0xFF00;
 // data bus is actually 8 bits (pins 4 - 5 and A5 - A0) long, 1s are trash
 const int data_bus[8] = {6, 7, 8, 9, 10, 11, 12, 13};
-const int CS = 0;
-const int RS = 1;
+const int CS = 2;
+// active low
+
+const int offset = 0xFF00;
 bool serviced = false;
 
 void setup() {
@@ -24,9 +26,9 @@ void setup() {
   EEPROM[0xFFFC - offset] = 0x00;
   EEPROM[0xFFFD - offset] = 0xFF;
 
+  oscillate(1000000, osc);
+
   Serial.begin(115200);
-  Serial.println(EEPROM.length());
-  hexdump();
   Serial.println("RDY");
 }
 
@@ -77,21 +79,19 @@ void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
 }
 
 void serialEvent() { 
-  if (digitalRead(RS) == LOW) {
-    String message = Serial.readString();
-    Serial.println(message.length());
-    byte buffer[16];
-    int b = 0;
-    int j = 0;
-    for (int i = 0; j < message.length() && j != -1; i = j + 1) {
-      j = message.indexOf('\n', i + 1);
-      strToBytes(message.substring(i, j), buffer, sizeof(buffer));
-      for (int a = 0; a < sizeof(buffer); a++) {
-        EEPROM[b + a] = buffer[a];
-      }
-      b += sizeof(buffer);
+  String message = Serial.readString();
+  Serial.println(message.length());
+  byte buffer[16];
+  int b = 0;
+  int j = 0;
+  for (int i = 0; j < message.length() && j != -1; i = j + 1) {
+    j = message.indexOf('\n', i + 1);
+    strToBytes(message.substring(i, j), buffer, sizeof(buffer));
+    for (int a = 0; a < sizeof(buffer); a++) {
+      EEPROM[b + a] = buffer[a];
     }
-    hexdump();
-    eepromClear();
+    b += sizeof(buffer);
   }
+  hexdump();
+  eepromClear();
 }
