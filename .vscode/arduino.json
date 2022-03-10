@@ -1,5 +1,5 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "dataprint/dataprint.ino",
+    "sketch": "emulateEEPROM/emulateEEPROM.ino",
     "port": "/dev/ttyACM0"
 }
