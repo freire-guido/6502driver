@@ -37,16 +37,15 @@ void loop() {
     if (digitalRead(CS) == LOW) {
       int address = readBus(addr_bus, 16) - offset;
       writeBus(data_bus, EEPROM[address]);
-      Serial.print(address, BIN);
-      Serial.print(' ');
-      Serial.println(address, HEX);
-
+      Serial.print("data: ");
+      printBus(data_bus, 8);
+      Serial.print("address: ");
+      printBus(addr_bus, 16);
+      Serial.println("---");
       serviced = true;
-      digitalWrite(LED_BUILTIN, HIGH);
     }
   }  if (digitalRead(CS) == HIGH) {
     serviced = false;
-    digitalWrite(LED_BUILTIN, LOW);
   }
 }
 

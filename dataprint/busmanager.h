@@ -15,3 +15,10 @@ void writeBus(const int bus[], const byte data) {
     digitalWrite(bus[i], bitRead(data, i) == 1 ? HIGH : LOW);
   }
 }
+
+void printBus(const int bus[], const int _sz) {
+  int data = readBus(bus, _sz);
+  Serial.print(data, BIN);
+  Serial.print(' ');
+  Serial.println(data, HEX);
+}
