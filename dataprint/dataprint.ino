@@ -1,43 +1,26 @@
-#include <EEPROM.h>
 #include "busmanager.h"
 #include "oscillator.h"
 
-const int ph = 2;
-const int osc = 3;
-const int addr_bus[8] = {4, 5, A5, A4, A3, A2, A1, A0};
-const int data_bus[8] = {6, 7, 8, 9, 10, 11, 12, 13};
+const int PH = 2;
+const int OSC = 3;
+const int ADDR[16] = {13, 12, 11, 10, 9, 8, 7, 6, 5, 4, A0, A1, A2, A3, A4, A5};
 
 bool serviced = false;
 
 void setup() {
-  Serial.begin(9600);
-  for (int addr : addr_bus) {
-    pinMode(addr, INPUT);
+  for (int i = 0; i < 16; i++) {
+    pinMode(ADDR[i], INPUT);
   }
-  for (int data : data_bus) {
-    pinMode(data, INPUT);
-  }
-  pinMode(ph, INPUT);
-  oscillate(1000000, osc);
+  pinMode(PH, INPUT);
+  oscillate(1000000, 3);
+  Serial.begin(115200);
   Serial.println("RDY");
 }
 
 void loop() {
-  if (!serviced && digitalRead(ph) == LOW) {
-    int data = readBus(data_bus, 8);
-    int address = readBus(addr_bus, 8);
-    Serial.print("data: ");
-    Serial.print(data, BIN);
-    Serial.print(' ');
-    Serial.println(data, HEX);
-    Serial.print("addr: ");
-    Serial.print(address, BIN);
-    Serial.print(' ');
-    Serial.println(address, HEX);
-    Serial.println("--------"); 
-    serviced != serviced;
-  }
-  if (digitalRead(ph) == HIGH) {
-    serviced = false;
-  }
+  unsigned int address = readBus(ADDR, 16);
+  Serial.print(address, BIN); 
+  Serial.print(' ');
+  Serial.println(address, HEX);
+  while (digitalRead(PH) == LOW) {}
 }

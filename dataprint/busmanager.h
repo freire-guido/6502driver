@@ -1,10 +1,8 @@
-int readBus(const int bus[], const int _sz) {
-  int res = 0;
+unsigned int readBus(const int bus[], const int _sz) {
+  unsigned int res = 0;
   for (int i = 0; i < _sz; i++) {
     pinMode(bus[i], INPUT);
-    if (digitalRead(bus[i]) == HIGH) {
-      res |= (1 << i);
-    }
+    res |= (unsigned int) digitalRead(bus[i]) << i;
   }
   return(res);
 }
