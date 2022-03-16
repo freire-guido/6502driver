@@ -2,51 +2,42 @@
 #include "busmanager.h"
 #include "oscillator.h"
 
-const int osc = 3;
-const int addr_bus[16] = {1, 1, 1, 1, 1, 1, 1, 1, 4, 5, A5, A4, A3, A2, A1, A0};
+const int OSC = 2;
+const int CS = A0;
+// active high
+const int ADDR[16] = {3, 4, 5, A5, A4, A3, A2, A1, A0, A0, A0, A0, A0, A0, A0, A0};
 // data bus is actually 8 bits (pins 4 - 5 and A5 - A0) long, 1s are trash
-const int data_bus[8] = {6, 7, 8, 9, 10, 11, 12, 13};
-const int CS = 2;
-// active low
+const int DATA[8] = {6, 7, 8, 9, 10, 11, 12, 13};
 
 const int offset = 0xFF00;
-bool serviced = false;
 
 void setup() {
-  for (int addr : addr_bus) {
-    pinMode(addr, INPUT);
-  }
-  for (int data : data_bus) {
-    pinMode(data, OUTPUT);
-  }
-  pinMode(1, INPUT_PULLUP); // 1s are trash
   pinMode(CS, INPUT);
 
   eepromClear();
   EEPROM[0xFFFC - offset] = 0x00;
   EEPROM[0xFFFD - offset] = 0xFF;
 
-  oscillate(1000000, osc);
+  oscillate(1000000, OSC);
 
   Serial.begin(115200);
   Serial.println("RDY");
 }
 
 void loop() {
-  while (!serviced) {
-    if (digitalRead(CS) == LOW) {
-      int address = readBus(addr_bus, 16) - offset;
-      writeBus(data_bus, EEPROM[address]);
-      Serial.print("data: ");
-      printBus(data_bus, 8);
-      Serial.print("address: ");
-      printBus(addr_bus, 16);
-      Serial.println("---");
-      serviced = true;
-    }
-  }  if (digitalRead(CS) == HIGH) {
-    serviced = false;
-  }
+  unsigned int address = readBus(ADDR, 16);
+  unsigned int data = readBus(DATA, 8);
+  writeBus(DATA, EEPROM[address - offset]);
+  Serial.print("DATA: ");
+  Serial.print(data, BIN);
+  Serial.print(' ');
+  Serial.println(data, HEX);
+  Serial.print("ADDR: ");
+  Serial.print(address, BIN);
+  Serial.print(' ');
+  Serial.println(address, HEX);
+  Serial.println("---");
+  while (!digitalRead(CS)) {};
 }
 
 void eepromClear() {
@@ -85,11 +76,11 @@ void serialEvent() {
   int j = 0;
   for (int i = 0; j < message.length() && j != -1; i = j + 1) {
     j = message.indexOf('\n', i + 1);
-    strToBytes(message.substring(i, j), buffer, sizeof(buffer));
-    for (int a = 0; a < sizeof(buffer); a++) {
+    strToBytes(message.substring(i, j), buffer, 16);
+    for (int a = 0; a < 16; a++) {
       EEPROM[b + a] = buffer[a];
     }
-    b += sizeof(buffer);
+    b += 16;
   }
   hexdump();
   eepromClear();
