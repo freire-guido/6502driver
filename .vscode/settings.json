@@ -2,5 +2,6 @@
     "files.associations": {
         "new": "cpp"
     },
-    "arduino.defaultBaudRate": 9600
+    "arduino.defaultBaudRate": 9600,
+    "arduino.path": "/usr/bin/"
 }

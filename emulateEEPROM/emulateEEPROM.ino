@@ -2,30 +2,28 @@
 #include "busmanager.h"
 #include "oscillator.h"
 
-const int OSC = 2;
-const int CS = A0;
-// active high
-const int ADDR[16] = {3, 4, 5, A5, A4, A3, A2, A1, A0, A0, A0, A0, A0, A0, A0, A0};
-// data bus is actually 8 bits (pins 4 - 5 and A5 - A0) long, 1s are trash
-const int DATA[8] = {6, 7, 8, 9, 10, 11, 12, 13};
+const int OSC = 10;
+const int PH2 = 11;
+const int ADDR[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+const int DATA[8] = {A5, A4, A3, A2, A1, A0, 12, 13};
 
 const int offset = 0xFF00;
 
 void setup() {
-  pinMode(CS, INPUT);
+  pinMode(PH2, INPUT);
 
   eepromClear();
   EEPROM[0xFFFC - offset] = 0x00;
   EEPROM[0xFFFD - offset] = 0xFF;
 
-  oscillate(1000000, OSC);
+  oscillate(0.1, OSC);
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("RDY");
 }
 
 void loop() {
-  unsigned int address = readBus(ADDR, 16);
+  unsigned int address = readBus(ADDR, 8);
   unsigned int data = readBus(DATA, 8);
   writeBus(DATA, EEPROM[address - offset]);
   Serial.print("DATA: ");
@@ -37,7 +35,7 @@ void loop() {
   Serial.print(' ');
   Serial.println(address, HEX);
   Serial.println("---");
-  while (!digitalRead(CS)) {};
+  while (digitalRead(PH2) == LOW) {};
 }
 
 void eepromClear() {
@@ -69,6 +67,7 @@ void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
 }
 
 void serialEvent() { 
+  eepromClear();
   String message = Serial.readString();
   Serial.println(message.length());
   byte buffer[16];
@@ -83,5 +82,4 @@ void serialEvent() {
     b += 16;
   }
   hexdump();
-  eepromClear();
 }

@@ -1,26 +1,27 @@
 #include "busmanager.h"
 #include "oscillator.h"
 
-const int PH = 2;
-const int OSC = 3;
-const int ADDR[16] = {13, 12, 11, 10, 9, 8, 7, 6, 5, 4, A0, A1, A2, A3, A4, A5};
+const int OSC = 10;
+const int PH2 = 11;
+const int ADDR[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+const int DATA[8] = {A5, A4, A3, A2, A1, A0, 12, 13};
 
 bool serviced = false;
 
 void setup() {
-  for (int i = 0; i < 16; i++) {
-    pinMode(ADDR[i], INPUT);
+  for (int address: ADDR) {
+    pinMode(address, INPUT);
   }
-  pinMode(PH, INPUT);
-  oscillate(1000000, 3);
-  Serial.begin(115200);
+  pinMode(PH2, INPUT);
+  oscillate(1, OSC);
+  Serial.begin(9600);
   Serial.println("RDY");
 }
 
 void loop() {
-  unsigned int address = readBus(ADDR, 16);
+  unsigned int address = readBus(ADDR, 8);
   Serial.print(address, BIN); 
   Serial.print(' ');
   Serial.println(address, HEX);
-  while (digitalRead(PH) == LOW) {}
+  while (digitalRead(PH2) == LOW) {}
 }
