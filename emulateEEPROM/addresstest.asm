@@ -1,9 +1,18 @@
     PROCESSOR 6502
-    ORG $F00
+    ORG $FF00
 
     LDX #$00
     LDY #$00
+    JSR separate
+    JSR separate
+    JSR separate
+    JSR separate
+    JSR separate
     JMP loop
+
+separate:
+    LDA $1234
+    RTS
 
 range:
     CPX #$FF
