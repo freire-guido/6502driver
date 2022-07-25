@@ -4,26 +4,20 @@
 
 const int OSC = 10;
 const int PH2 = 11;
-const int ADDR[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+const int ADDR[16] = {2, 3, 4, 5, 6, 7, 8, 9, PH2, PH2, PH2, PH2, PH2, PH2, PH2, PH2};
 const int DATA[8] = {A5, A4, A3, A2, A1, A0, 12, 13};
 
 const int offset = 0xFF00;
 
 void setup() {
   pinMode(PH2, INPUT);
-
-  eepromClear();
-  EEPROM[0xFFFC - offset] = 0x00;
-  EEPROM[0xFFFD - offset] = 0xFF;
-
-  oscillate(0.1, OSC);
-
+  oscillate(1000000, OSC);
   Serial.begin(9600);
   Serial.println("RDY");
 }
 
 void loop() {
-  unsigned int address = readBus(ADDR, 8);
+  unsigned int address = readBus(ADDR, 16);
   unsigned int data = readBus(DATA, 8);
   writeBus(DATA, EEPROM[address - offset]);
   Serial.print("DATA: ");
@@ -34,8 +28,9 @@ void loop() {
   Serial.print(address, BIN);
   Serial.print(' ');
   Serial.println(address, HEX);
-  Serial.println("---");
-  while (digitalRead(PH2) == LOW) {};
+  while (digitalRead(PH2) == LOW) {
+    Serial.println();
+  };
 }
 
 void eepromClear() {
@@ -68,6 +63,8 @@ void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
 
 void serialEvent() { 
   eepromClear();
+  EEPROM[0xFFFC - offset] = 0x00;
+  EEPROM[0xFFFD - offset] = 0xFF;
   String message = Serial.readString();
   Serial.println(message.length());
   byte buffer[16];
