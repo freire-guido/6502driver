@@ -13,3 +13,13 @@ void writeBus(const int bus[], const byte data) {
     digitalWrite(bus[i], bitRead(data, i) == 1 ? HIGH : LOW);
   }
 }
+
+void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
+  int i = 0;
+  int j = str.indexOf(delim);
+  for (int b = 0; b < _sz && j != -1; b++) {
+    buff[b] = str.substring(i, j).toInt();
+    i = j;
+    j = str.indexOf(delim, j + 1);
+  }
+}

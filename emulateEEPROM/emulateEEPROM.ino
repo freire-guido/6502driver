@@ -51,16 +51,6 @@ void hexdump() {
   }
 }
 
-void strToBytes(String str, byte buff[], int _sz, char delim = ' ') {
-  int b = 0;
-  int j = 0;
-  for (int i = 0; b < _sz && j != -1; i = j + 1) {
-    j = str.indexOf(delim, i + 1);
-    buff[b] = byte(str.substring(i, j).toInt());
-    b++;
-  }
-}
-
 void serialEvent() { 
   eepromClear();
   EEPROM[0xFFFC - offset] = 0x00;
