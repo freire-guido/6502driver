@@ -59,14 +59,14 @@ void serialEvent() {
   Serial.println(message.length());
   byte buffer[16];
   int b = 0;
-  int j = 0;
-  for (int i = 0; j < message.length() && j != -1; i = j + 1) {
-    j = message.indexOf('\n', i + 1);
+  int j = message.indexOf('\n');
+  for (int i = 0; i < message.length() && j != -1; i = j + 1) {
     strToBytes(message.substring(i, j), buffer, 16);
     for (int a = 0; a < 16; a++) {
       EEPROM[b + a] = buffer[a];
     }
     b += 16;
+    j = message.indexOf('\n', j + 1);
   }
   hexdump();
 }
