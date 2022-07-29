@@ -1,0 +1,3 @@
+    PROCESSOR 6502
+    ORG $0000
+    LDX #$12
