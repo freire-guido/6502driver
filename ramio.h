@@ -1,13 +1,11 @@
 #include "busmanager.h"
 
 struct RAM {
-    const int addr[16];
-    const int data[8];
-    const int ce;
-    const int we;
-    const int start = 0;
-    bool werror = false;
-    bool read(const int ad) {
+    const int* addr;
+    const int* data;
+    int ce, we, start;
+    RAM(const int* a, const int* d, int c, int w, int s = 0): addr{a}, data{d}, ce{c}, we{w}, start{s} {};
+    bool read(const int ad) const {
         digitalWrite(we, HIGH);
         digitalWrite(ce, LOW);
         writeBus(addr, 16, start + ad);
@@ -16,7 +14,7 @@ struct RAM {
         digitalWrite(we, HIGH);
         return readval;
     }
-    bool write(const int ad, const byte da, bool checkerr = true) {
+    bool write(const int ad, const byte da, bool checkerr = true) const {
         digitalWrite(we, LOW);
         digitalWrite(ce, LOW);
         writeBus(addr, 16, start + ad);
